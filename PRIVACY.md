@@ -1,9 +1,10 @@
 # WebToolbox Chrome Extension Privacy Policy
 
-Last updated: October 7, 2026.
+Last updated: October 12, 2026.
 
-This policy describes the WebToolbox Chrome extension, including its 0.1.2
-read-only Login preview/copy implementation. The extension is a client for the
+This policy describes the WebToolbox Chrome extension, including the Phase 2
+Login preview, explicit copy/reveal, and click-to-fill functionality prepared
+for version 0.2.4. The extension is a client for the
 WebToolbox server you configure. It does not include a publisher-operated hosted
 vault service. This policy does not replace the policies or practices of your
 chosen server operator, Google Chrome, the Chrome Web Store, or GitHub.
@@ -11,7 +12,8 @@ chosen server operator, Google Chrome, the Chrome Web Store, or GitHub.
 ## Purpose and information handled
 
 The extension uses information only to find matching Login records, show a
-selected preview, and let you explicitly copy or reveal a value.
+selected preview, and let you explicitly copy, reveal, or fill supported login
+fields from that selected record.
 
 It handles the following information:
 
@@ -24,7 +26,13 @@ It handles the following information:
   provides the current tab URL. The extension extracts its scheme, hostname,
   and effective port for matching. It sends that origin to your configured
   server; the page path, query string, and fragment are not sent. It does not
-  inspect page content, forms, other tabs, or browsing history.
+  monitor other tabs or browsing history.
+- **Supported login-field metadata.** Clicking Fill checks ordinary inputs in
+  the current page's top-level document for username, password and authenticator
+  code fields. It inspects input types, labels, autocomplete hints, visibility,
+  form ownership/destinations and constraints locally. This metadata, page
+  labels and HTML are not sent to the server. Existing page-entered credentials
+  are not collected for saving or sent to the server.
 - **Matching Login summaries.** The server returns matching record identifiers,
   record names, usernames, and the matched website origin. The extension uses
   them to display a list and request a selected record.
@@ -43,6 +51,16 @@ It handles the following information:
   extension rechecks the selected preview and writes that field value to the
   system clipboard. It does not read clipboard contents. Revealing a masked
   field is a separate action and does not copy it.
+- **Explicit Fill output.** Clicking Fill requests fresh username/password
+  values and a current generated OTP for the eligible roles from the selected
+  Login, bound to its revision and website origin. The server receives the
+  selected record identifier, revision, origin and role names, not DOM selectors
+  or page contents. Only values for the verified fields are delivered temporarily
+  to the extension's isolated page script and assigned to those inputs. Normal
+  input/change events are dispatched; local retention checks do not send the
+  resulting page values back to the server. OTP setup secrets never reach the
+  extension or website. Filling needs no second confirmation and does not submit
+  the form or create/update records.
 
 Password masking is visual protection, not a claim that a selected password
 never reaches the browser. Selected field values, including masked values, are
@@ -52,14 +70,18 @@ received and held temporarily in the popup so the preview/copy features can work
 
 Extension API requests go only to the WebToolbox server you select and approve.
 They send the current website origin and, when needed, the selected record
-identifier or pagination parameters. Chrome and the server also handle normal
+identifier, record revision, requested role names or pagination parameters.
+Chrome and the server also handle normal
 connection metadata, such as your client IP address and session authentication.
 
 The extension does not send vault contents or browsing information to a separate
 publisher analytics service, advertising network, data broker, or AI-training
 service. It contains no telemetry, advertising, background browsing monitor,
-page-injected script, or remote executable code. It does not automatically fill
-or submit forms, copy values, or create/update Login records.
+remote executable code. Its packaged isolated scripts run in the current page
+only after an explicit Fill click. It does not fill on page load, submit forms,
+automatically continue to another sign-in step, or create/update Login records.
+Selecting a Login or refreshing its displayed OTP never fills a page. A later
+OTP-only step needs another Fill click.
 
 Your chosen server processes these requests and retains its own vault,
 authentication, and operational data. WebToolbox's browser API records security
@@ -99,6 +121,13 @@ Expired OTP codes are cleared locally. New codes are requested only while the
 selected popup preview is focused and visible, subject to fresh permission,
 website, record, and session checks. There is no background OTP polling.
 
+Fill values are retained only for the operation and references are discarded on
+completion, cancellation or failure. Closing the popup, switching away during a
+pending Fill, changing the page or losing permissions cancels the operation.
+Values already written into the website belong to that page; clearing the popup
+does not erase them or promise recovery of values the page has received. Automatic
+OTP preview refresh does not update a code already filled into the website.
+
 Clipboard retention is separate. A copied value can remain after the popup is
 closed or cleared, and other applications or clipboard-history tools may access
 it. The extension does not automatically erase the clipboard or clipboard history.
@@ -113,13 +142,16 @@ operator's settings and practices.
 
 | Permission | Purpose |
 | --- | --- |
-| `activeTab` | Obtain the current tab URL after you invoke the extension, then extract its origin for Login matching. |
+| `activeTab` | Obtain the invoked tab's URL for origin matching and temporarily access that current page for explicit Fill. |
+| `scripting` | Run packaged field detection/validation and native input assignment in Chrome's isolated world after an explicit Fill click. |
 | `storage` | Save the configured and temporary pending server origins locally. |
 | `clipboardWrite` | Copy a field value only after an explicit copy action. |
 | Optional host access | Send authenticated API requests to the server you choose and approve. The extension reconciles saved grants to retain only the selected server. |
 
 The extension does not request browsing-history, cookie-reading,
-clipboard-reading, page-scripting, or persistent content-script permissions.
+clipboard-reading, persistent content-script matches or broad website host
+permissions. The added `scripting` permission works with the temporary current-tab
+grant; server host grants remain optional and scoped to the approved server.
 
 Normal server connections require trusted HTTPS. HTTP is allowed only for
 explicit loopback addresses (`localhost`, `127.0.0.1`, or `[::1]`) for local
@@ -137,7 +169,10 @@ development testing or paste credentials into an untrusted or insecure website.
   extension configuration, not your server-side data or previously copied values.
 - Sign out of WebToolbox to end that server session. A retained open preview may
   remain visible until it is cleared, but future preview, copy, reveal, or OTP
-  renewal requests must pass the server's current session checks.
+  renewal or Fill requests must pass the server's current session checks.
+- Use **Profile → Sessions** on a supporting server to view and end active
+  sessions. Ending this Chrome profile's WebToolbox session prevents later
+  extension data requests, including Fill.
 - Manage or delete server-side records and account data through WebToolbox or
   your server operator. Closing or uninstalling this client does not perform
   server-side deletion.

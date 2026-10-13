@@ -6,21 +6,25 @@ It does not contain the private implementation, deployment configuration, or vau
 
 ## Chrome extension
 
-The WebToolbox extension is a read-only companion to a WebToolbox server you
-choose. Open it on a website to find matching Login records, preview one record,
-and explicitly copy a field for manual pasting.
+The WebToolbox extension is a companion to a WebToolbox server you choose. Open
+it on a website to find matching Login records, preview one record, and click
+**Fill** to insert eligible username/password/current authenticator-code fields.
+You can also explicitly copy a field for manual pasting.
 
-The extension does not fill forms, inspect page content, save or modify Login
-records, or monitor browsing in the background. It does not include a hosted
+Fill checks supported input metadata locally and never submits the form, fills
+on page load, saves or modifies Login records, or monitors browsing in the
+background. It does not include a hosted
 vault service or create a WebToolbox account for you.
 
 ### Release status
 
-As of October 7, 2026, extension version **0.1.2** has been tested as an unpacked
-development extension with the WebToolbox **1.4.1** backend. An **unlisted** Chrome
-Web Store release is being prepared; it has not yet been published. A store
-installation link will be added here after publication. Unlisted means anyone
-with that link can install; it does not mean private distribution.
+The previously released Chrome Web Store version is **0.1.3**, with preview and
+explicit copy/reveal. Phase 2 release candidate **0.2.4** adds click-to-fill and
+uses the existing MFA-complete WebToolbox session. Its Store update is being
+prepared; this text does not claim submission or approval of that update.
+The existing **unlisted** item is
+[WebToolbox in the Chrome Web Store](https://chromewebstore.google.com/detail/webtoolbox/fadbcipjnkmpjpakgfglcljakmmjohka).
+Unlisted means anyone with that link can install; it does not mean private distribution.
 
 ### Features
 
@@ -36,6 +40,14 @@ with that link can install; it does not mean private distribution.
 - Configured one-time passwords are visible with a countdown and refresh while
   the selected preview is focused and visible. OTP setup secrets are not returned
   by the browser API.
+- **Fill** sits beside the selected Login's name. A single click fills eligible
+  username/password/current OTP fields. Username/password and OTP on separate
+  pages are normal; each page needs its own Fill click. Ordinary successful
+  fills, missing OTP fields/values and OTP timing skips finish silently. A detected
+  OTP field that cannot accept the complete code shows a red error without truncation.
+- Supported website exclusions, including `data-wtb-ignore`, are respected.
+  Fill supports ordinary top-level inputs; split OTP boxes, iframe/shadow/custom
+  controls and signup/password-change fields are outside this release's contract.
 - Closing the popup discards its preview. The server controls focus-loss cleanup
   and an always-enabled inactivity timeout.
 
@@ -47,6 +59,9 @@ with that link can install; it does not mean private distribution.
 - Browser integration enabled by the server administrator.
 - A normal WebToolbox sign-in with MFA completed in the same Chrome profile.
   Remember-me alone is not enough.
+- A server implementing browser protocol v2 is required for Fill. With an older
+  server, preview/copy remain available and Fill is disabled. Session management
+  appears under **Profile → Sessions** on a supporting server.
 
 HTTP server connections are restricted to loopback addresses for local
 development. Do not bypass certificate warnings or use real credentials in
@@ -54,9 +69,10 @@ development testing.
 
 ### Setup and use
 
-1. Install the extension from its unlisted Chrome Web Store link once published.
-   Before publication, an unpacked development package must be supplied separately
-   by the maintainer; this documentation repository is not an installable package.
+1. Install the extension from the unlisted Chrome Web Store link above. The
+   available Store version may remain 0.1.3 until the Phase 2 update is approved.
+   An unpacked release candidate must be supplied separately by the maintainer;
+   this documentation repository is not an installable package.
 2. Open the extension and choose **Settings**.
 3. Enter only your server's origin, such as `https://vault.example.com`. Do not
    enter a page path, query string, or credentials.
@@ -65,7 +81,9 @@ development testing.
    configuration should be recovered without entering the address again.
 5. Sign in to WebToolbox in a normal tab and complete MFA in the same profile.
 6. Visit the website associated with a Login record, open the extension, and
-   select a match. Click a field to copy it and paste it yourself.
+   select a match. With the Phase 2 update and supporting server, click **Fill**
+   to insert the supported fields, then submit the website form yourself.
+   Clicking a preview field still copies it for manual pasting.
 
 The host displayed in the matching/preview screen is the current website, not
 your configured WebToolbox server. View or change the server address in Settings.
