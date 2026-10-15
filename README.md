@@ -14,10 +14,11 @@ After a supported login submission, Login capture can offer **New item** or
 
 ### Release status
 
-Version **0.2.4** is published and installed from the Chrome Web Store, as confirmed
-by the operator on October 14, 2026. Candidate **0.3.0** adds template participation,
-global Login capture, unchanged-credential suppression and confirmed Save/Update.
-It is being prepared; this does not claim its submission, approval or publication.
+Version **0.3.0** is published in the Chrome Web Store, as confirmed by the operator
+on October 15, 2026. It adds template participation, global Login capture,
+unchanged-credential suppression and confirmed Save/Update. The operator also
+confirmed the in-place Store update from 0.2.4, retained settings, website consent,
+preview/copy/Fill, capture/Save/Update and sign-out/MFA recovery.
 The existing unlisted item is
 [WebToolbox in the Chrome Web Store](https://chromewebstore.google.com/detail/webtoolbox/fadbcipjnkmpjpakgfglcljakmmjohka).
 Anyone with an unlisted link can install it; unlisted is not private distribution.
