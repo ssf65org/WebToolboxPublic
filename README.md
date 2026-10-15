@@ -1,133 +1,124 @@
 # WebToolboxPublic
 
-Public documentation for WebToolbox and its Chrome browser extension. This
-repository contains product information and the extension's [privacy policy](PRIVACY.md).
-It does not contain the private implementation, deployment configuration, or vault data.
+Public information and the [privacy policy](PRIVACY.md) for WebToolbox and its
+Chrome extension. This repository does not contain private deployment settings
+or vault data.
 
 ## Chrome extension
 
-The WebToolbox extension is a companion to a WebToolbox server you choose. Open
-it on a website to find matching Login records, preview one record, and click
-**Fill** to insert eligible username/password/current authenticator-code fields.
-You can also explicitly copy a field for manual pasting.
-
-Fill checks supported input metadata locally and never submits the form, fills
-on page load, saves or modifies Login records, or monitors browsing in the
-background. It does not include a hosted
-vault service or create a WebToolbox account for you.
+WebToolbox is a companion to your own WebToolbox server. Open it on a website to
+find matching Login records, preview a record, click **Fill** for supported
+username/password/current one-time-code fields, or explicitly copy a field.
+After a supported login submission, Login capture can offer **New item** or
+**Update existing**. Saving or updating always requires your confirmation.
 
 ### Release status
 
-The previously released Chrome Web Store version is **0.1.3**, with preview and
-explicit copy/reveal. Phase 2 release candidate **0.2.4** adds click-to-fill and
-uses the existing MFA-complete WebToolbox session. Its Store update is being
-prepared; this text does not claim submission or approval of that update.
-The existing **unlisted** item is
+Version **0.2.4** is published and installed from the Chrome Web Store, as confirmed
+by the operator on October 14, 2026. Candidate **0.3.0** adds template participation,
+global Login capture, unchanged-credential suppression and confirmed Save/Update.
+It is being prepared; this does not claim its submission, approval or publication.
+The existing unlisted item is
 [WebToolbox in the Chrome Web Store](https://chromewebstore.google.com/detail/webtoolbox/fadbcipjnkmpjpakgfglcljakmmjohka).
-Unlisted means anyone with that link can install; it does not mean private distribution.
+Anyone with an unlisted link can install it; unlisted is not private distribution.
 
 ### Features
 
-- Matching considers all URL fields in an eligible Login record.
-- Each URL field supports **Only match exact host**. Otherwise, matching can
-  include the base domain and its subdomains; the URL scheme and effective port
-  must still match. Local addresses and shared-hosting boundaries are treated
-  conservatively.
-- Selecting a match opens a preview. Empty fields are omitted. Passwords start
-  visually masked and have an independent eye toggle.
-- Clicking a field, or focusing it and pressing Enter/Space, explicitly copies
-  its value. Copy and reveal recheck the server session and record eligibility.
-- Configured one-time passwords are visible with a countdown and refresh while
-  the selected preview is focused and visible. OTP setup secrets are not returned
-  by the browser API.
-- **Fill** sits beside the selected Login's name. A single click fills eligible
-  username/password/current OTP fields. Username/password and OTP on separate
-  pages are normal; each page needs its own Fill click. Ordinary successful
-  fills, missing OTP fields/values and OTP timing skips finish silently. A detected
-  OTP field that cannot accept the complete code shows a red error without truncation.
-- Supported website exclusions, including `data-wtb-ignore`, are respected.
-  Fill supports ordinary top-level inputs; split OTP boxes, iframe/shadow/custom
-  controls and signup/password-change fields are outside this release's contract.
-- Closing the popup discards its preview. The server controls focus-loss cleanup
-  and an always-enabled inactivity timeout.
+- Match every URL field in eligible records. Each URL supports **Only match exact
+  host**; otherwise base-domain/subdomain matching respects scheme, effective port
+  and public-suffix boundaries.
+- Enable any user-owned template for Login search on a supporting v3 server.
+  Map required username/password fields and an optional TOTP field. Multiple
+  enabled templates and the system Login share one matching list.
+- Preview supported fields with masked passwords and an independent eye toggle.
+  Clicking a field, or Enter/Space while focused, explicitly copies its value.
+- Display generated one-time codes with a countdown and focused preview refresh.
+  OTP setup secrets are not sent to the extension.
+- Click **Fill** beside the record name. Fill never submits a website or runs
+  automatically on page load. For a separate OTP page, open the extension there
+  and click Fill again. Success and routine missing-value/timing outcomes are
+  silent; unsupported detected field lengths and other actionable failures show
+  red errors. Supported exclusions, including `data-wtb-ignore`, are respected.
+- Enable global Login capture in Settings (on by default, with Chrome website
+  access). Supported deliberate submissions are compared with your server before
+  a badge appears. An exact saved username/password pair creates no offer.
+  Automatic comparison sends a fresh nonce-bound password digest, not the raw
+  password. A digest is still sensitive and requires HTTPS protection.
+- Review the first captured item in the list. Its name comes from the source page
+  title; its original URL excludes query/fragment tokens. Supported same-site
+  redirects retain that source and the existing deadline.
+- Choose **New item**, a template and an editable name, then **Save**. Or choose
+  **Update existing**, explicitly select an item by name/username, then **Update**.
+  Only this confirmation sends the captured raw credentials. Updates preserve
+  unrelated fields, URLs, OTP settings and files. Capture never collects OTP codes.
+- Use Back to return without saving, or X to discard. Interrupted write responses
+  can be checked using **Check saved Login**, without another write.
 
-### Requirements
+Ordinary top-level inputs are supported. Split OTP boxes, iframe/shadow/custom
+controls, signup/password-change/recovery flows and automatic website submission
+are outside the current contract. Capture detects a submission, not proof that
+sign-in succeeded. Review before saving.
 
-- Google Chrome and a compatible WebToolbox server. The server-controlled cleanup
-  settings described here are available in WebToolbox 1.4.1.
-- A trusted HTTPS connection to the server and access to it from your browser.
-- Browser integration enabled by the server administrator.
-- A normal WebToolbox sign-in with MFA completed in the same Chrome profile.
-  Remember-me alone is not enough.
-- A server implementing browser protocol v2 is required for Fill. With an older
-  server, preview/copy remain available and Fill is disabled. Session management
-  appears under **Profile → Sessions** on a supporting server.
+### Requirements and setup
 
-HTTP server connections are restricted to loopback addresses for local
-development. Do not bypass certificate warnings or use real credentials in
-development testing.
+1. Install the available Store version using the link above. An unpacked candidate
+   is supplied separately; this documentation repository is not an extension ZIP.
+2. Open **Settings**, enter your server's origin, such as
+   `https://vault.example.com`, and choose the global capture preference.
+3. Click **Save and allow access** and approve Chrome's requested server/website
+   access. Capture requests supported HTTPS websites and loopback development
+   pages. Reopen the popup if the permission prompt closes it.
+4. Sign in to your WebToolbox server and complete MFA in the same Chrome profile.
+   Remember-me alone is insufficient. Browser integration must be enabled by the
+   server administrator. No extension pairing or separate unlock is required.
+5. Open the extension on a matching website for preview/copy/Fill. For capture,
+   submit a supported form yourself, then open a captured offer if one appears.
 
-### Setup and use
+A trusted HTTPS server is required; HTTP is restricted to explicit loopback
+addresses for development. Use synthetic data on development fixtures. The
+current website shown above matches is distinct from your configured server.
+No hosted vault service or WebToolbox account is provided by the extension.
 
-1. Install the extension from the unlisted Chrome Web Store link above. The
-   available Store version may remain 0.1.3 until the Phase 2 update is approved.
-   An unpacked release candidate must be supplied separately by the maintainer;
-   this documentation repository is not an installable package.
-2. Open the extension and choose **Settings**.
-3. Enter only your server's origin, such as `https://vault.example.com`. Do not
-   enter a page path, query string, or credentials.
-4. Click **Save and allow access** and approve Chrome's access request for that
-   server. If the permission prompt closes the popup, reopen it; the saved
-   configuration should be recovered without entering the address again.
-5. Sign in to WebToolbox in a normal tab and complete MFA in the same profile.
-6. Visit the website associated with a Login record, open the extension, and
-   select a match. With the Phase 2 update and supporting server, click **Fill**
-   to insert the supported fields, then submit the website form yourself.
-   Clicking a preview field still copies it for manual pasting.
+Protocol v3 is required for owned-template participation, capture and Save/Update.
+An older server retains supported v2 Fill/v1 preview/copy for the built-in Login;
+the extension never retries a write through an older protocol. Use the server
+build implementing ADR-025-03; server and extension version numbers are separate.
+Manage active server sessions through **Profile → Sessions**.
 
-The host displayed in the matching/preview screen is the current website, not
-your configured WebToolbox server. View or change the server address in Settings.
-After signing in or resolving an access problem, reopen the popup or click
-**Retry** to recheck access.
+### Capture and cleanup settings
 
-### Preview cleanup
+In extension Settings, uncheck **Enable Login capture** and save to stop observers
+everywhere and discard pending captures. Existing Chrome website grants remain
+approved; manage them separately in Chrome's extension site-access controls.
+The configured server is excluded from observation. Incognito is not supported.
 
-In WebToolbox, go to **Settings → Advanced → Browser extension preview**:
+In WebToolbox **Config → Advanced → Browser extension**, supporting servers offer:
 
-- **Clear preview on focus loss:** off by default. Turning it on discards the
-  open preview when switching apps. With it off, an open popup can retain a
-  completed view until its timeout; closing the popup always discards it.
-- **Preview inactivity timeout (seconds):** 60 by default, configurable from
-  1 to 3600 seconds. It is always enabled. Explicit successful data requests
-  restart it; focus changes and automatic OTP refresh do not.
+- **Clear preview on focus loss:** off by default. Closing the popup always clears
+  its selected preview. Pending operations can still cancel when focus is lost.
+- **Preview inactivity timeout:** 60 seconds by default, configurable from 1 to
+  3600. Explicit successful data requests restart it; focus changes and automatic
+  OTP refresh do not.
+- **Captured Login lifetime:** 120 seconds by default, configurable from 1 to
+  3600. It is an absolute deadline; review, reopening and redirects never extend
+  it. Changes apply to new submissions, preserving existing deadlines.
 
-Changed server settings apply on the next successful extension response. Refresh
-the preview to receive them. Older servers without this policy retain legacy
-focus-loss clearing and a 60-second timeout.
+### Privacy and support
 
-### Privacy and clipboard
+Only non-secret settings are saved locally. Selected previews live in popup
+memory. Pending captured usernames/passwords use trusted memory-only extension
+session storage until expiry/discard/cleanup, never local or sync storage.
+Confirmed credentials go only to your selected server. No advertising, telemetry,
+remote executable code or browsing-history recording service is included.
+Read the [privacy policy](PRIVACY.md) for capture, comparison, recovery, permissions
+and retention details.
 
-The extension sends only the current website's origin, not its path or page
-content, to your chosen server. It stores non-secret server connection addresses
-locally; selected Login data is held temporarily in the popup, not saved in
-extension storage. There is no extension telemetry or advertising.
+Copied values use the system clipboard and can remain available to other apps or
+clipboard-history tools. The extension does not read or automatically clear it.
+Uninstalling the client does not delete server records/history/backups.
 
-Copied values use the system clipboard. They may remain available to other
-applications or clipboard-history tools after the popup closes. The extension
-does not read or automatically clear the clipboard.
-
-Read the [privacy policy](PRIVACY.md) for data handling, retention, permissions,
-and the distinction between the extension and your server operator.
-
-## Support
-
-For non-sensitive questions or bug reports, use
-[GitHub Issues](https://github.com/ssf65org/WebToolboxPublic/issues).
-Account, vault-data, and server-log requests should go to the operator of your
-WebToolbox server.
-
-Do not post passwords, OTP setup secrets or codes, session cookies, API keys,
-backup/recovery codes, private server addresses, unredacted logs, or vault exports
-in public issues. Use synthetic examples and remove private information from
-screenshots. Do not report a security issue with sensitive details in a public
-issue; request a private contact route first without disclosing those details.
+Use [GitHub Issues](https://github.com/ssf65org/WebToolboxPublic/issues) for
+non-sensitive support. Contact your server operator about accounts, vault data
+and logs. Do not post credentials, OTP setup secrets/codes, cookies, recovery
+codes, private addresses, exports or unredacted screenshots/logs. For sensitive
+security reports, request a private contact route before sharing details.
