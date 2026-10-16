@@ -1,11 +1,12 @@
 # WebToolbox Chrome Extension Privacy Policy
 
-Last updated: October 14, 2026.
+Last updated: October 16, 2026.
 
 This policy describes the WebToolbox Chrome extension, including the preview,
-copy/reveal, click-to-fill, Login capture and confirmed Save/Update functionality
-prepared for version 0.3.0. The extension connects to the WebToolbox server you
-configure. It does not include a publisher-operated hosted vault service. This
+copy/reveal, click-to-fill, Login capture, confirmed Save/Update and local
+diagnostics/download functionality in version 0.3.4. The extension connects to
+the WebToolbox server you configure. It does not include a publisher-operated
+hosted vault service. This
 policy does not replace the practices of your chosen server operator, Google
 Chrome, the Chrome Web Store or GitHub.
 
@@ -70,6 +71,25 @@ confirmed creation or credential updates after a supported login submission.
   requires an explicitly selected record and changes only supplied mapped
   credentials, preserving unrelated values, OTP configuration, URLs and files.
   No OTP setup secret is captured or created. The website cannot approve a write.
+- **Local diagnostics.** A built-in log records timestamps, packaged operation
+  names and fixed result codes, API route names, HTTP statuses and request durations
+  to help explain capture, Fill and Save/Update failures. Field reports include
+  bounded input positions, generated form numbers, types, allowed autocomplete
+  tokens, role evidence/selection, length constraints, whether a pattern is present,
+  destination categories and exclusion counts. They exclude field values,
+  credentials, OTP codes/secrets, comparison digests/nonces, cookies, tokens,
+  request/response bodies, website/server addresses, page titles, record/account/tab
+  identifiers, DOM IDs/names/labels, arbitrary page text and exception messages.
+  Settings → Show log also performs a separate metadata-only inspection of the
+  current permitted page before opening its log tab. That inspection does not
+  read input values or make a server request; it does not replace the original
+  submission report. Diagnostic metadata is never automatically uploaded.
+- **Downloaded diagnostics.** Clicking Download on the log page saves a fresh JSON
+  snapshot, including all retained field details, UTC timestamps, the local
+  timezone, extension/Chrome versions and retention limits. This is a local file
+  download with no server request or automatic sharing. If you choose to send
+  the file for support, the recipient receives that metadata under the service
+  you use to share it.
 
 ## Destinations and use
 
@@ -105,6 +125,21 @@ review.
 Local extension storage contains non-secret connection settings and the global
 capture preference, not vault credentials. Chrome sync storage is not used.
 Chrome separately manages website permissions and session cookies.
+
+Diagnostics are enabled automatically and stored separately in trusted,
+memory-only `storage.session`, accessible to extension contexts rather than
+website content scripts. The extension keeps up to 30 minutes, 256 KiB of
+serialized JSON or 2,000 entries, whichever limit is reached first, removing the
+oldest entries. Cleanup alarms and every log read/write apply these limits; a
+delayed alarm after sleep does not make expired entries eligible for display or
+download. Reading, refreshing or downloading never extends an entry's lifetime.
+Clear log removes diagnostics without changing settings, captured credentials or
+write recovery state. Logs survive service-worker suspension, but extension
+reload/update/disable and Chrome restart clear session storage. They are not
+written to local/sync storage. Downloaded JSON is a separate file: it remains
+until you remove it and may be larger than the storage cap because of formatting
+and export metadata. Clearing or expiring the extension log does not remove a
+downloaded copy.
 
 Matching results and selected previews live in popup memory. Closing the popup
 clears that view; errors, configuration changes and inactivity also clear affected
@@ -154,10 +189,10 @@ records, sessions, history, logs or backups.
 | Permission | Purpose |
 | --- | --- |
 | `activeTab` | Read the invoked website URL and temporarily access that page for explicit Fill. |
-| `scripting` | Execute packaged isolated detection/Fill code and register packaged top-level capture observers on Chrome-permitted websites. |
-| `storage` | Save non-secret settings locally and restrict temporary captures/recovery receipts to memory-only trusted session storage. |
+| `scripting` | Execute packaged isolated detection/Fill and metadata inspection code, and register packaged top-level capture observers on Chrome-permitted websites. |
+| `storage` | Save non-secret settings locally and restrict temporary captures/recovery receipts and bounded diagnostic metadata to memory-only trusted session storage. |
 | `clipboardWrite` | Copy only after an explicit field copy action. |
-| `alarms` | Schedule cleanup of expiring captured credentials; no periodic browsing-history collection or background OTP polling. |
+| `alarms` | Schedule cleanup of expiring captured credentials and diagnostic metadata; no periodic browsing-history collection or background OTP polling. |
 | Optional HTTPS/loopback host access | Connect to your selected server. When capture is enabled, request website access for supported HTTPS sites and loopback development pages. |
 
 There are no mandatory all-site host grants, history, cookie-reading or
@@ -180,6 +215,9 @@ no certificate bypass. Use synthetic data on development fixtures.
 - Review the proposed name, website and credentials, then choose New item or an
   explicit Update existing target. Back retains the existing capture deadline;
   neither Back nor closing review saves a record.
+- Open Settings → Show log to inspect diagnostics, Clear log to remove retained
+  entries, or Download to save a local JSON copy for optional support. Downloading
+  does not upload the file or clear the log; manage downloaded copies separately.
 - Manage site access, disable or uninstall the extension through Chrome.
 - Sign out or use **Profile → Sessions** to end a server session. A completed open
   preview can remain until cleanup, but later data/Fill/capture/write requests

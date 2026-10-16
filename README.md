@@ -14,11 +14,14 @@ After a supported login submission, Login capture can offer **New item** or
 
 ### Release status
 
-Version **0.3.0** is published in the Chrome Web Store, as confirmed by the operator
-on October 15, 2026. It adds template participation, global Login capture,
-unchanged-credential suppression and confirmed Save/Update. The operator also
-confirmed the in-place Store update from 0.2.4, retained settings, website consent,
-preview/copy/Fill, capture/Save/Update and sign-out/MFA recovery.
+Version **0.3.4** is published in the Chrome Web Store, as confirmed by the operator
+on October 16, 2026. It adds local diagnostic logs, capture field/decision reports
+and JSON downloads, plus capture responsiveness and login-form compatibility fixes.
+It retains template participation, global Login capture, unchanged-credential
+suppression and confirmed Save/Update. Store-installed checks for this release
+remain pending. The operator previously confirmed the in-place 0.2.4-to-0.3.0
+Store update and its retained settings, consent and vault operations; those checks
+do not cover the 0.3.4 update.
 The existing unlisted item is
 [WebToolbox in the Chrome Web Store](https://chromewebstore.google.com/detail/webtoolbox/fadbcipjnkmpjpakgfglcljakmmjohka).
 Anyone with an unlisted link can install it; unlisted is not private distribution.
@@ -54,6 +57,12 @@ Anyone with an unlisted link can install it; unlisted is not private distributio
   unrelated fields, URLs, OTP settings and files. Capture never collects OTP codes.
 - Use Back to return without saving, or X to discard. Interrupted write responses
   can be checked using **Check saved Login**, without another write.
+- Open **Settings → Show log** for timestamped request statuses/durations and
+  capture/Fill/Save decisions. Expand field reports to see which input positions
+  were selected and why. The log records bounded metadata, without field values,
+  website addresses or page-provided identifiers. **Download** saves a fresh JSON
+  snapshot with all field reports, timestamps, timezone and extension/Chrome
+  versions; nothing is uploaded automatically.
 
 Ordinary top-level inputs are supported. Split OTP boxes, iframe/shadow/custom
 controls, signup/password-change/recovery flows and automatic website submission
@@ -109,10 +118,15 @@ In WebToolbox **Config → Advanced → Browser extension**, supporting servers 
 Only non-secret settings are saved locally. Selected previews live in popup
 memory. Pending captured usernames/passwords use trusted memory-only extension
 session storage until expiry/discard/cleanup, never local or sync storage.
+Local diagnostic metadata uses the same trusted session-storage mechanism with
+separate limits: 30 minutes, 256 KiB of serialized JSON or 2,000 entries, whichever
+is reached first. Clear log removes it without changing settings or captures.
+Extension reload/update/disable and Chrome restart clear session storage.
+Downloaded logs remain on disk until you remove them.
 Confirmed credentials go only to your selected server. No advertising, telemetry,
 remote executable code or browsing-history recording service is included.
 Read the [privacy policy](PRIVACY.md) for capture, comparison, recovery, permissions
-and retention details.
+and diagnostic/download retention details.
 
 Copied values use the system clipboard and can remain available to other apps or
 clipboard-history tools. The extension does not read or automatically clear it.
