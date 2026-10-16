@@ -14,14 +14,19 @@ After a supported login submission, Login capture can offer **New item** or
 
 ### Release status
 
-Version **0.3.4** is published in the Chrome Web Store, as confirmed by the operator
-on October 16, 2026. It adds local diagnostic logs, capture field/decision reports
-and JSON downloads, plus capture responsiveness and login-form compatibility fixes.
-It retains template participation, global Login capture, unchanged-credential
-suppression and confirmed Save/Update. Store-installed checks for this release
-remain pending. The operator previously confirmed the in-place 0.2.4-to-0.3.0
-Store update and its retained settings, consent and vault operations; those checks
-do not cover the 0.3.4 update.
+Version **0.3.6** is published in the Chrome Web Store, as confirmed by the operator
+on October 16, 2026. It includes local diagnostic logs, capture field/decision
+reports and JSON downloads, plus capture responsiveness and login-form fixes.
+For two-step sign-in, it can
+capture a visible read-only username beside the current password when no eligible
+editable username is selected. Fill still skips read-only inputs. It also allows
+password-only creation with an empty username on an updated server, or an explicit
+password-only update that preserves the saved username. Two-step read-only
+username capture/review was operator-confirmed before publication. It retains
+template participation, global Login capture, unchanged-credential suppression
+and confirmed Save/Update. Genuine Store-installed update checks for 0.3.6 remain
+pending; the earlier confirmed 0.2.4-to-0.3.0 update does not cover this release.
+
 The existing unlisted item is
 [WebToolbox in the Chrome Web Store](https://chromewebstore.google.com/detail/webtoolbox/fadbcipjnkmpjpakgfglcljakmmjohka).
 Anyone with an unlisted link can install it; unlisted is not private distribution.

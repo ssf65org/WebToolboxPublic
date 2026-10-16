@@ -4,10 +4,9 @@ Last updated: October 16, 2026.
 
 This policy describes the WebToolbox Chrome extension, including the preview,
 copy/reveal, click-to-fill, Login capture, confirmed Save/Update and local
-diagnostics/download functionality in version 0.3.4. The extension connects to
+diagnostics/download functionality in version 0.3.6. The extension connects to
 the WebToolbox server you configure. It does not include a publisher-operated
-hosted vault service. This
-policy does not replace the practices of your chosen server operator, Google
+hosted vault service. This policy does not replace the practices of your chosen server operator, Google
 Chrome, the Chrome Web Store or GitHub.
 
 ## Purpose and information handled
@@ -35,6 +34,13 @@ confirmed creation or credential updates after a supported login submission.
   username/password values after deliberate login submission. It does not read
   website one-time codes for capture. It respects supported exclusion markers,
   including `data-wtb-ignore`. Capture does not establish that sign-in succeeded.
+  From version 0.3.6, when no eligible editable username is selected beside the
+  current password, capture can read one visible read-only username identified
+  by supported username hints in the same login area. Editable usernames take
+  precedence; ambiguous, hidden, disabled, ignored, unrelated and non-login
+  fields remain excluded. Read-only password inputs are excluded, and Fill never
+  writes a read-only input. This does not merge credentials from earlier pages
+  or steps; values are read only at the supported deliberate submission.
 - **Automatic credential comparison.** Before showing a badge or capture offer,
   the extension sends the original origin, exact username when available, a fresh
   random nonce and a nonce/session/origin-bound password digest to your chosen
